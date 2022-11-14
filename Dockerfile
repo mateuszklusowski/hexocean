@@ -16,8 +16,8 @@ RUN python -m venv /py && \
         libpq-dev\
         postgresql-client \
         libjpeg-dev \
-        libffi-dev \
-        musl-dev &&\
+        zlib1g-dev \
+        musl-dev && \
     /py/bin/pip install --no-compile -r /tmp/requirements.txt && \
     rm -rf /tmp && \
     adduser \

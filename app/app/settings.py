@@ -20,12 +20,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-s5v^olzq9a5!=2r5+3()io74(!nwnm!*f&yl#pado$ks=9g3gw"
+SECRET_KEY = (
+    "django-insecure-s5v^olzq9a5!=2r5+3()io74(!nwnm!*f&yl#pado$ks=9g3gw"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+AUTH_USER_MODEL = "core.User"
 
 
 # Application definition
@@ -39,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_cleanup.apps.CleanupConfig",
     "rest_framework",
+    "sorl.thumbnail",
     "core",
 ]
 
@@ -86,6 +91,14 @@ DATABASES = {
     }
 }
 
+# Cache
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://redis:6379/0",
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

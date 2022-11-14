@@ -6,3 +6,4 @@ redis>=4.3.4, <4.4
 django-cleanup>=6.0.0, <6.1
 black>=22.10.0, <22.11.0
 flake8>=5.0.4, <5.0.5
+sorl-thumbnail>=12.9.0, <12.10
