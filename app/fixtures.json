@@ -1,0 +1,51 @@
+[
+    {
+      "model": "core.thumbnail",
+      "pk": 1,
+      "fields": {
+        "value": 200
+      }
+    },
+    {
+      "model": "core.thumbnail",
+      "pk": 2,
+      "fields": {
+        "value": 400
+      }
+    },
+    {
+        "model": "core.tier",
+        "pk": 1,
+        "fields": {
+          "name": "Basic",
+          "can_create_link": false,
+          "thumbnails": [
+            1
+          ]
+        }
+      },
+      {
+        "model": "core.tier",
+        "pk": 2,
+        "fields": {
+          "name": "Premium",
+          "can_create_link": false,
+          "thumbnails": [
+            2,
+            1
+          ]
+        }
+      },
+      {
+        "model": "core.tier",
+        "pk": 3,
+        "fields": {
+          "name": "Enterprise",
+          "can_create_link": true,
+          "thumbnails": [
+            2,
+            1
+          ]
+        }
+      }
+  ]
