@@ -35,8 +35,6 @@ AUTH_USER_MODEL = "core.User"
 # Application definition
 
 INSTALLED_APPS = [
-    "admin_interface",
-    "colorfield",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -49,9 +47,6 @@ INSTALLED_APPS = [
     "core",
 ]
 
-# django-admin-interface dependecies
-X_FRAME_OPTIONS = "SAMEORIGIN"
-SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -100,10 +95,7 @@ DATABASES = {
 # Cache
 
 CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://redis:6379/0",
-    }
+    "default": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"}
 }
 
 # Password validation
@@ -120,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator", 
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 

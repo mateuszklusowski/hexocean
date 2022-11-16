@@ -16,6 +16,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Test
-        run: docker-compose run --rm app sh -c "python3 manage.py wait_for_db && sleep 5 && python3 manage.py test"
+        run: docker-compose run --rm app sh -c "python3 manage.py wait_for_db && sleep 5 && python3 manage.py test --settings 'app.test_settings'"
       - name: Lint
         run: docker-compose run --rm app sh -c "flake8"

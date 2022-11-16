@@ -9,7 +9,6 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from django.urls import reverse
-from django.test import override_settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from core.models import Image, BinaryImageLink
@@ -27,11 +26,6 @@ def get_binary_link_url(binary_image_pk):
     return reverse("core:get-binary-link", args=[binary_image_pk])
 
 
-@override_settings(
-    CACHES={
-        "default": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"}
-    }
-)
 class ImagesAPITests(APITestCase):
     def setUp(self):
         thumbnail1 = sample_thumbnail(value=100)
