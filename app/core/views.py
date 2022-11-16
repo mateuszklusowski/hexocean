@@ -19,12 +19,14 @@ from .permissions import DoesUserHaveTier, IsAuthenticated, CanUserCreateLink
 
 
 class ImageListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Image.objects.select_related("user")
     permission_classes = (IsAuthenticated, DoesUserHaveTier)
     serializer_class = ImagesSerializer
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.get_object())
+        queryset = Image.objects.select_related("user").filter(
+            user=self.get_object()
+        )
+        return queryset
 
     def get_object(self):
         return self.request.user
