@@ -1,7 +1,8 @@
 import os
 import tempfile
+import shutil
 
-from PIL import Image
+from PIL import Image as pillow_image
 
 from unittest.mock import patch
 
@@ -34,6 +35,11 @@ def sample_image(**params):
 
 
 class ModelTests(TestCase):
+    def tearDown(self):
+        path = "/vol/web/media/uploads/user"
+        if os.path.exists(path):
+            shutil.rmtree(path)
+
     def test_create_user_model(self):
         params = {
             "email": "testuser@email.com",
@@ -106,7 +112,7 @@ class ModelTests(TestCase):
     def test_bianry_image_link_model(self):
         user = sample_user(username="user", password="testpassword")
         with tempfile.NamedTemporaryFile(suffix=".png") as image_file:
-            img = Image.new("RGB", (1, 1))
+            img = pillow_image.new("RGB", (1, 1))
             img.save(image_file, "png")
             image_file.seek(0)
 
@@ -144,7 +150,7 @@ class ModelTests(TestCase):
     def test_image_model(self):
         user = sample_user(username="user", password="testpassword")
         with tempfile.NamedTemporaryFile(suffix=".png") as image_file:
-            img = Image.new("RGB", (1, 1))
+            img = pillow_image.new("RGB", (1, 1))
             img.save(image_file, "png")
             image_file.seek(0)
 

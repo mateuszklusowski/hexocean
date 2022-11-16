@@ -6,6 +6,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, UserManager
 from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.db import models
+from django.utils import timezone
 
 from sorl.thumbnail import ImageField
 
@@ -51,13 +52,17 @@ class Thumbnail(models.Model):
     value = models.SmallIntegerField(unique=True)
 
     def __str__(self):
-        return self.value
+        return str(self.value)
 
 
 class Tier(models.Model):
     name = models.CharField(max_length=150, unique=True)
     thumbnails = models.ManyToManyField(Thumbnail)
     can_create_link = models.BooleanField(default=False)
+
+    def clean(self):
+        super().clean()
+        self.name = self.name.capitalize()
 
     def __str__(self):
         return self.name
@@ -67,7 +72,7 @@ class BinaryImageLink(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     binary_image = models.ImageField(upload_to=user_binary_images_file_path)
     exist_seconds = models.SmallIntegerField()
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
