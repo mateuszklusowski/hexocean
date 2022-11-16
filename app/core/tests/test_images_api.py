@@ -198,6 +198,23 @@ class ImagesAPITests(APITestCase):
         self.assertIn("image", res.data[0])
         self.assertIn("binary_image_link", res.data[0])
 
+    def test_upload_image_with_wrong_ext(self):
+        self.user.tier = self.basic_tier
+        self.user.save()
+        self.client.force_authenticate(user=self.user)
+
+        with tempfile.NamedTemporaryFile(suffix=".gif") as image_file:
+            img = pillow_image.new("RGB", (200, 200))
+            img.save(image_file, "GIF")
+            image_file.seek(0)
+            payload = {"image": image_file}
+            res = self.client.post(
+                IMAGE_UPLOAD_URL, payload, format="multipart"
+            )
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(self.user.image_set.count(), 0)
+
     def test_create_binary_link_unauthorized(self):
         with tempfile.NamedTemporaryFile(suffix=".png") as image_file:
             img = pillow_image.new("RGB", (1, 1))

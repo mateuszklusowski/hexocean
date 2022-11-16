@@ -12,7 +12,7 @@ app_name = "core"
 urlpatterns = [
     path("", include(router.urls)),
     path(
-        "images/<int:image_pk>/create",
+        "images/<int:image_pk>/create/",
         views.CreateBinaryLinkView.as_view(),
         name="create-link",
     ),
