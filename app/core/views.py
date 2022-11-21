@@ -7,7 +7,6 @@ from rest_framework import viewsets, status, mixins, generics, views
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from django.http.response import HttpResponseRedirect
 from django.urls import reverse
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils import timezone
@@ -25,7 +24,7 @@ class ImageListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     def get_queryset(self):
         queryset = Image.objects.select_related("user").filter(
             user=self.get_object()
-        )
+        ).order_by('id')
         return queryset
 
     def get_object(self):
@@ -37,25 +36,23 @@ class ImageListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-
-            return HttpResponseRedirect(
-                self.__class__.reverse_action(self, url_name="list")
-            )
+            msg = {'image': _('Successfuly created.')}
+            return Response(msg, status=status.HTTP_201_CREATED)
 
     def list(self, request):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
+        queryset = self.paginate_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
 
         if self.get_object().tier.name == "Basic":
             serializer = self.get_serializer(
-                self.get_queryset(), fields=("thumbnails",), many=True
+                queryset, fields=("thumbnails",), many=True
             )
 
         if self.get_object().tier.name == "Premium":
             serializer = self.get_serializer(
-                self.get_queryset(), fields=("image", "thumbnails"), many=True
+                queryset, fields=("image", "thumbnails"), many=True
             )
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return self.get_paginated_response(serializer.data)
 
 
 class CreateBinaryLinkView(generics.CreateAPIView):

@@ -122,21 +122,21 @@ class ImagesAPITests(APITestCase):
                 IMAGE_UPLOAD_URL, payload, format="multipart"
             )
 
-        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(self.user.image_set.count(), 1)
 
         res = self.client.get(IMAGES_LIST_URL)
-        self.assertIn("thumbnails", res.data[0])
+        self.assertIn("thumbnails", res.data.get('results')[0])
 
         thumbnail_values = {}
-        for data in res.data[0]["thumbnails"]:
+        for data in res.data.get('results')[0].get('thumbnails'):
             thumbnail_values.update(data)
 
         for thumbnail in self.user.tier.thumbnails.all():
             self.assertIn(thumbnail.value, thumbnail_values)
 
-        self.assertNotIn("binary_image_link", res.data[0])
-        self.assertNotIn("image", res.data[0])
+        self.assertNotIn("binary_image_link", res.data.get('results')[0])
+        self.assertNotIn("image", res.data.get('results')[0])
 
     def test_upload_image_with_premium_tier(self):
         self.user.tier = self.premium_tier
@@ -152,21 +152,21 @@ class ImagesAPITests(APITestCase):
                 IMAGE_UPLOAD_URL, payload, format="multipart"
             )
 
-        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(self.user.image_set.count(), 1)
 
         res = self.client.get(IMAGES_LIST_URL)
-        self.assertIn("thumbnails", res.data[0])
+        self.assertIn("thumbnails", res.data.get('results')[0])
 
         thumbnail_values = {}
-        for data in res.data[0]["thumbnails"]:
+        for data in res.data.get('results')[0].get('thumbnails'):
             thumbnail_values.update(data)
 
         for thumbnail in self.user.tier.thumbnails.all():
             self.assertIn(thumbnail.value, thumbnail_values)
 
-        self.assertIn("image", res.data[0])
-        self.assertNotIn("binary_image_link", res.data[0])
+        self.assertIn("image", res.data.get('results')[0])
+        self.assertNotIn("binary_image_link", res.data.get('results')[0])
 
     def test_upload_image_with_enterprise_tier(self):
         self.user.tier = self.enterprise_tier
@@ -182,21 +182,44 @@ class ImagesAPITests(APITestCase):
                 IMAGE_UPLOAD_URL, payload, format="multipart"
             )
 
-        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(self.user.image_set.count(), 1)
 
         res = self.client.get(IMAGES_LIST_URL)
-        self.assertIn("thumbnails", res.data[0])
+        self.assertIn("thumbnails", res.data.get('results')[0])
 
         thumbnail_values = {}
-        for data in res.data[0]["thumbnails"]:
+        for data in res.data.get('results')[0].get('thumbnails'):
             thumbnail_values.update(data)
 
         for thumbnail in self.user.tier.thumbnails.all():
             self.assertIn(thumbnail.value, thumbnail_values)
 
-        self.assertIn("image", res.data[0])
-        self.assertIn("binary_image_link", res.data[0])
+        self.assertIn("image", res.data.get('results')[0])
+        self.assertIn("binary_image_link", res.data.get('results')[0])
+
+    def test_pagination(self):
+        self.user.tier = self.basic_tier
+        self.user.save()
+        self.client.force_authenticate(user=self.user)
+
+        for _ in range(3):
+            with tempfile.NamedTemporaryFile(suffix=".png") as image_file:
+                img = pillow_image.new("RGB", (200, 200))
+                img.save(image_file, "png")
+                image_file.seek(0)
+                payload = {"image": image_file}
+                res = self.client.post(
+                    IMAGE_UPLOAD_URL, payload, format="multipart"
+                )
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.user.image_set.count(), 3)
+
+        res = self.client.get(IMAGES_LIST_URL)
+        self.assertEqual(res.data.get('count'), 3)
+        self.assertTrue(res.data.get('next'))
+        self.assertFalse(res.data.get('previous'))
 
     def test_upload_image_with_wrong_ext(self):
         self.user.tier = self.basic_tier
